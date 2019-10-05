@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+
+    .wrapper {
+      position: relative;
+      width: 400px;
+      height: 250px;
+      margin: 100px auto 0;
+      /* border : 1px solid #000; */
+      overflow: hidden;
+
+
+    }
+
+    .wrapper .sliderPage {
+      position: absolute;
+      height: 250px;
+      width: 2000px;
+    }
+
+
+    .wrapper .sliderPage li {
+      float: left;
+      width: 400px;
+      height: 250px;
+    }
+
+    .wrapper .sliderPage img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .wrapper .btn {
+      width: 40px;
+      top: 50%;
+      margin-top: -20px;
+      height: 40px;
+      color: #fff;
+      background-color: #000;
+      text-align: center;
+      line-height: 40px;
+      position: absolute;
+      opacity: 0.1;
+      cursor: pointer;
+    }
+
+    .wrapper .btn:hover {
+      opacity: 1;
+    }
+
+    .wrapper .leftBtn {
+      left: 15px;
+    }
+
+    .wrapper .rightBtn {
+      right: 15px;
+    }
+
+    .wrapper .sliderIndex {
+      position: absolute;
+      bottom: 15px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .wrapper .sliderIndex span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background-color: #ccc;
+      border-radius: 50%;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .wrapper .sliderIndex .active {
+      background-color: orangered;
+    }
+  </style>
+  <title>基础轮转功能</title>
+</head>
+
+<body>
+  <div class="wrapper">
+    <ul class="sliderPage">
+      <li><img src="Img/1.jpg" alt=""></li>
+      <li><img src="Img/2.jpg" alt=""></li>
+      <li><img src="Img/3.jpg" alt=""></li>
+      <li><img src="Img/4.jpg" alt=""></li>
+      <li><img src="Img/1.jpg" alt=""></li>
+    </ul>
+    <div class="btn leftBtn">&lt;</div>
+    <div class="btn rightBtn">&</div>
+    <div class="sliderIndex">
+      <span class="active"></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  <script src="index1.js"></script>
+  <script>
+    var timer = null;
+    var sliderPage = document.getElementsByClassName('sliderPage')[0];
+    var moveWidth = 400;
+    var num = sliderPage.children.length - 1;
+    var lock = true;
+    var index =0;
+    var oSpanArr = document.getElementsByClassName('sliderIndex')[0].children;
+
+    var leftBtn = document.getElementsByClassName('leftBtn')[0];
+    var rightBtn = document.getElementsByClassName('rightBtn')[0];
+
+    leftBtn.onclick = function () {
+      autoMove('right->left');
+    }
+
+
+    rightBtn.onclick = function () {
+      autoMove('left->right');
+    }
+
+    for(var i = 0; i<oSpanArr.length ;i++){
+      (function(myIndex){
+
+        oSpanArr[i].onclick= function(){
+          
+           lock  = false;
+           clearTimeout(timer);
+           index = myIndex;
+           startBufferMove(sliderPage,{left: -index * moveWidth},function(){
+             lock = true;
+             timer = setTimeout(autoMove,1500);
+             changeIndex(index);
+           });
+        }
+
+      }(i))
+      }
+
+
+
+    function autoMove(direction) {
+
+      //开启锁 回调完毕才解开
+      if (lock) {
+
+        lock = false;
+        clearTimeout(timer);
+        if (!direction || direction == 'left->right') {
+          index++;
+          var tempLeft = sliderPage.offsetLeft - moveWidth;
+          startBufferMove(sliderPage, { left: tempLeft }, function () {
+            if (sliderPage.offsetLeft == -num * moveWidth) {
+              sliderPage.style.left = '0px';
+              index = 0;
+            }
+
+            timer = setTimeout(autoMove, 2000)
+            lock = true;
+            changeIndex(index)
+          })
+        } else if (direction == "right->left") {
+
+          if (sliderPage.offsetLeft == 0) {
+            console.log(sliderPage.offsetLeft);
+            sliderPage.style.left = -num * moveWidth + 'px';
+            index = num;
+          }
+          index --;
+          var tempLeft = sliderPage.offsetLeft + moveWidth;
+          startBufferMove(sliderPage, { left: tempLeft }, function () {
+            if (sliderPage.offsetLeft == -num * moveWidth) {
+                sliderPage.style.left = '0px';
+                
+            }
+
+            timer = setTimeout(autoMove , 2000)
+            lock = true;
+            changeIndex(index);
+          })
+        }
+       
+      }
+    }
+
+    //延迟执行
+    timer = setTimeout(function () {
+      autoMove()
+    }, 2000)
+
+
+    //点切换状态
+    function  changeIndex(_index){
+      for(var i = 0; i<oSpanArr.length ;i++){
+        oSpanArr[i].className = '';
+      }
+
+      oSpanArr[_index].className = 'active'
+    }
+
+
+  </script>
+</body>
+
+</html>
