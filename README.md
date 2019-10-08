@@ -1,2 +1,1 @@
-# RotationChart
-原生js 简单轮播图
+效果展示:https://853219061.github.io/RotationChart/
